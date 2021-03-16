@@ -1,11 +1,13 @@
-import { AppState, Batsmen, Bowler } from "./types";
+import { Batsmen, Bowler } from "./types";
 
-export const initState: AppState = {
-  matchStatus: "LIVE",
-  oversLimit: 20,
-  matchAbandoned: {
-    status: false,
-    reason: ""
+export const AppState = {
+  match: {
+    matchStatus: "LIVE",
+    oversLimit: 20,
+    matchAbandoned: {
+      status: false,
+      reason: ""
+    }
   },
   inningsOne: {
     teamName: "",
