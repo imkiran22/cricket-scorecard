@@ -1,15 +1,18 @@
-import { combineReducers, createAction, createReducer } from "@reduxjs/toolkit";
-const pushActionCreator = createAction("PUSH");
-
-const sampleReducer = createReducer([] as Array<string>, (builder) => {
-  builder.addCase(
-    pushActionCreator.toString(),
-    (state, action: { type: string; payload: string }) => {
-      state.push(action.payload);
-    }
-  );
-});
-
+import { combineReducers } from "@reduxjs/toolkit";
+import { matchReducer } from "./match-reducer";
+import { inningsOneReducer, inningsTwoReducer } from "./innings-reducer";
+import {
+  battingInningsOneReducer,
+  battingInningsTwoReducer
+} from "./batting-reducer";
 export const rootReducer = combineReducers({
-  sample: sampleReducer
+  match: matchReducer,
+  firstInnings: combineReducers({
+    innings: inningsOneReducer,
+    batting: battingInningsOneReducer
+  }),
+  secondInnings: combineReducers({
+    innings: inningsTwoReducer,
+    batting: battingInningsTwoReducer
+  })
 });
