@@ -35,13 +35,13 @@ export const ScoreCard: React.FC<{}> = () => {
     });
   }, []);
 
-  const Toss = (
-    teamOneName: string,
-    teamTwoName: string,
-    tossWon: string,
-    decision: string
-  ) => {
+  const Toss = (teamOneName: string, teamTwoName: string) => {
     const current = { innings: 1, batting: "", bowling: "" };
+    const arr = [1, 2];
+    let index = Math.floor(Math.random() * arr.length);
+    const tossWon = index === 1 ? teamOneName : teamTwoName;
+    index = Math.floor(Math.random() * arr.length);
+    const decision = index === 1 ? "BATTING" : "FIELDING";
     //UPDATE TEAM NAMES
     if (
       (teamOneName === tossWon && decision === "BATTING") ||
@@ -217,9 +217,7 @@ export const ScoreCard: React.FC<{}> = () => {
         value={JSON.stringify(inningsTwo, null, 4)}
       ></textarea>
       <h2>SCORE SHEET</h2>
-      <button onClick={() => Toss("India", "England", "England", "FIELDING")}>
-        TOSS
-      </button>
+      <button onClick={() => Toss("India", "England")}>TOSS</button>
       <button onClick={pushOpeners}>Push Openers</button>
       <button onClick={pickNextBatsmen}>Pick Next Batsmen</button>
       <button onClick={() => playerScore()}>UPDATE PLAYER SCORE</button>
