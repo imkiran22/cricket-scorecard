@@ -6,7 +6,7 @@ type PlayingDecision = "BATTING" | "FIELDING" | "";
 
 type TeamMeta = {
   name: string;
-  playingX1: Array<Player>;
+  // playingX1: Array<Player>;
 };
 
 export interface MatchState {

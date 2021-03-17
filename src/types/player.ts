@@ -4,10 +4,13 @@ export type PlayerType =
   | "bowler"
   | "wicket_keeper/batsmen";
 
-export type Player = {
+type PlayerStatus = "NOT_OUT" | "OUT" | "RETIRED_HUT" | "DID_NOT_BAT";
+
+export interface Player {
   name: string;
   playerType: PlayerType;
   age: number;
   run: number;
+  status: PlayerStatus;
   highestScore?: number;
-};
+}

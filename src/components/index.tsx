@@ -1,10 +1,27 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MatchState } from "../types";
+import _ from "lodash";
 import {
   teamOnePlayingX1,
   teamTwoPlayingX1
 } from "../constants/players-constants";
+
+const INDEXES: Record<number, string> = {
+  0: "INNINGS_ONE_PLAYER_ONE",
+  1: "INNINGS_ONE_PLAYER_TWO",
+  2: "INNINGS_ONE_PLAYER_THREE",
+  3: "INNINGS_ONE_PLAYER_FOUR",
+  4: "INNINGS_ONE_PLAYER_FIVE",
+  5: "INNINGS_ONE_PLAYER_SIX",
+  6: "INNINGS_ONE_PLAYER_SEVEN",
+  7: "INNINGS_ONE_PLAYER_EIGHT",
+  8: "INNINGS_ONE_PLAYER_NINE",
+  9: "INNINGS_ONE_PLAYER_TEN",
+  10: "INNINGS_ONE_PLAYER_ELEVEN"
+};
+
+const RUNS = [0, 1, 2, 3, 4, 6];
 
 export const ScoreCard: React.FC<{}> = () => {
   const match = useSelector((state: any) => state.match);
@@ -31,12 +48,18 @@ export const ScoreCard: React.FC<{}> = () => {
       (teamTwoName === tossWon && decision === "FIELDING")
     ) {
       dispatch({
-        type: "INNINGS_ONE_UPDATE_TEAM_NAME",
-        payload: teamOneName
+        type: "INNINGS_ONE_UPDATE_TEAM",
+        payload: {
+          teamName: teamOneName,
+          playingX1: [...teamOnePlayingX1]
+        }
       });
       dispatch({
-        type: "INNINGS_TWO_UPDATE_TEAM_NAME",
-        payload: teamTwoName
+        type: "INNINGS_TWO_UPDATE_TEAM",
+        payload: {
+          teamName: teamTwoName,
+          playingX1: [...teamTwoPlayingX1]
+        }
       });
       current.batting = "teamOne";
       current.bowling = "teamTwo";
@@ -45,12 +68,18 @@ export const ScoreCard: React.FC<{}> = () => {
       (teamTwoName === tossWon && decision === "BATTING")
     ) {
       dispatch({
-        type: "INNINGS_ONE_UPDATE_TEAM_NAME",
-        payload: teamTwoName
+        type: "INNINGS_ONE_UPDATE_TEAM",
+        payload: {
+          teamName: teamTwoName,
+          playingX1: [...teamTwoPlayingX1]
+        }
       });
       dispatch({
-        type: "INNINGS_TWO_UPDATE_TEAM_NAME",
-        payload: teamOneName
+        type: "INNINGS_TWO_UPDATE_TEAM",
+        payload: {
+          teamName: teamOneName,
+          playingX1: [...teamOnePlayingX1]
+        }
       });
       current.batting = "teamTwo";
       current.bowling = "teamOne";
@@ -63,12 +92,10 @@ export const ScoreCard: React.FC<{}> = () => {
         oversLimit: 20,
         current,
         teamOne: {
-          name: teamOneName,
-          playingX1: [...teamOnePlayingX1]
+          name: teamOneName
         },
         teamTwo: {
-          name: teamTwoName,
-          playingX1: [...teamTwoPlayingX1]
+          name: teamTwoName
         },
         tossWon,
         decision,
@@ -83,32 +110,95 @@ export const ScoreCard: React.FC<{}> = () => {
   const pushOpeners = () => {
     const currentBattingTeam = match.current.batting;
     console.log(currentBattingTeam);
+    let innings = inningsOne.innings;
+    if (match.current.innings === 2) {
+      innings = inningsTwo.innings;
+    }
     dispatch({
       type: "INNINGS_ONE_PLAYER_ONE",
-      payload: { ...match[currentBattingTeam].playingX1[0] }
+      payload: { ...innings.playingX1[0], status: "NOT_OUT" }
     });
     dispatch({
       type: "INNINGS_ONE_PLAYER_TWO",
-      payload: { ...match[currentBattingTeam].playingX1[1] }
+      payload: { ...innings.playingX1[1], status: "NOT_OUT" }
+    });
+    dispatch({
+      type: "INNINGS_ONE_UPDATE_TEAM_PLAYER_STATUS",
+      payload: { ...innings.playingX1[0], status: "NOT_OUT" }
+    });
+    dispatch({
+      type: "INNINGS_ONE_UPDATE_TEAM_PLAYER_STATUS",
+      payload: { ...innings.playingX1[1], status: "NOT_OUT" }
     });
   };
 
-  const playerOneScore = (run: number) => {
+  const playerOneScore = () => {
+    const index = Math.floor(Math.random() * RUNS.length);
     dispatch({
       type: "INNINGS_ONE_PLAYER_ONE",
       payload: {
-        run
+        run: RUNS[index]
       }
     });
   };
 
-  const playerTwoScore = (run: number) => {
-    dispatch({
-      type: "INNINGS_ONE_PLAYER_TWO",
-      payload: {
-        run
-      }
-    });
+  const playerScore = () => {
+    const i = Math.floor(Math.random() * RUNS.length);
+    let innings = inningsOne.innings;
+    if (match.current.innings === 2) {
+      innings = inningsTwo.innings;
+    }
+    const index = _.findIndex(innings.playingX1, { status: "NOT_OUT" });
+    alert(INDEXES[index]);
+    if (index > -1) {
+      dispatch({
+        type: INDEXES[index],
+        payload: {
+          run: RUNS[i]
+        }
+      });
+    }
+  };
+
+  const makePlayerOut = () => {
+    let innings = inningsOne.innings;
+    if (match.current.innings === 2) {
+      innings = inningsTwo.innings;
+    }
+    const index = _.findIndex(innings.playingX1, { status: "NOT_OUT" });
+    alert(INDEXES[index]);
+    if (index > -1) {
+      dispatch({
+        type: INDEXES[index],
+        payload: {
+          run: -1,
+          status: "OUT"
+        }
+      });
+      dispatch({
+        type: "INNINGS_ONE_UPDATE_TEAM_PLAYER_STATUS",
+        payload: { ...innings.playingX1[index], status: "OUT" }
+      });
+    }
+  };
+
+  const pickNextBatsmen = () => {
+    let innings = inningsOne.innings;
+    if (match.current.innings === 2) {
+      innings = inningsTwo.innings;
+    }
+    const index = _.findIndex(innings.playingX1, { status: "DID_NOT_BAT" });
+    alert(INDEXES[index]);
+    if (index > -1) {
+      dispatch({
+        type: INDEXES[index],
+        payload: { ...innings.playingX1[index], status: "NOT_OUT" }
+      });
+      dispatch({
+        type: "INNINGS_ONE_UPDATE_TEAM_PLAYER_STATUS",
+        payload: { ...innings.playingX1[index], status: "NOT_OUT" }
+      });
+    }
   };
 
   return (
@@ -141,8 +231,9 @@ export const ScoreCard: React.FC<{}> = () => {
         TOSS
       </button>
       <button onClick={pushOpeners}>Push Openers</button>
-      <button onClick={() => playerOneScore(4)}>UPDATE PLAYER ONE SCORE</button>
-      <button onClick={() => playerTwoScore(6)}>UPDATE PLAYER TWO SCORE</button>
+      <button onClick={pickNextBatsmen}>Pick Next Batsmen</button>
+      <button onClick={() => playerScore()}>UPDATE PLAYER SCORE</button>
+      <button onClick={() => makePlayerOut()}>MAKE BATSMEN OUT</button>
     </div>
   );
 };

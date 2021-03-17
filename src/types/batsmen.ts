@@ -1,6 +1,6 @@
-import { PlayerType } from "./player";
+import { Player, PlayerType } from "./player";
 
-export interface Batsmen {
+export interface Batsmen extends Player {
   name: string;
   type: PlayerType;
   score: number;

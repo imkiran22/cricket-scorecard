@@ -13,12 +13,12 @@ const init = () => {
       bowling: ""
     },
     teamOne: {
-      name: "",
-      playingX1: []
+      name: ""
+      // playingX1: []
     },
     teamTwo: {
-      name: "",
-      playingX1: []
+      name: ""
+      // playingX1: []
     },
     tossWon: "",
     decision: "",
