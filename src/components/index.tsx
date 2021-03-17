@@ -132,16 +132,6 @@ export const ScoreCard: React.FC<{}> = () => {
     });
   };
 
-  const playerOneScore = () => {
-    const index = Math.floor(Math.random() * RUNS.length);
-    dispatch({
-      type: "INNINGS_ONE_PLAYER_ONE",
-      payload: {
-        run: RUNS[index]
-      }
-    });
-  };
-
   const playerScore = () => {
     const i = Math.floor(Math.random() * RUNS.length);
     let innings = inningsOne.innings;
