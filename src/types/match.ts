@@ -1,6 +1,6 @@
 import { Player, PlayerType } from "./player";
 
-type MatchStatus = "SCHEDULED" | "LIVE" | "STUMPS" | "RESULT";
+export type MatchStatus = "SCHEDULED" | "LIVE" | "STUMPS" | "RESULT";
 
 type PlayingDecision = "BATTING" | "FIELDING" | "";
 

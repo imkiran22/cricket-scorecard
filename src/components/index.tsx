@@ -53,14 +53,14 @@ export const Container: React.FC<{}> = () => {
         type: "INNINGS_ONE_UPDATE_TEAM",
         payload: {
           teamName: teamOneName,
-          playingX1: [...teamOnePlayingX1]
+          playingX1: _.cloneDeep(teamOnePlayingX1)
         }
       });
       dispatch({
         type: "INNINGS_TWO_UPDATE_TEAM",
         payload: {
           teamName: teamTwoName,
-          playingX1: [...teamTwoPlayingX1]
+          playingX1: _.cloneDeep(teamTwoPlayingX1)
         }
       });
       current.batting = "teamOne";
@@ -73,14 +73,14 @@ export const Container: React.FC<{}> = () => {
         type: "INNINGS_ONE_UPDATE_TEAM",
         payload: {
           teamName: teamTwoName,
-          playingX1: [...teamTwoPlayingX1]
+          playingX1: _.cloneDeep(teamTwoPlayingX1)
         }
       });
       dispatch({
         type: "INNINGS_TWO_UPDATE_TEAM",
         payload: {
           teamName: teamOneName,
-          playingX1: [...teamOnePlayingX1]
+          playingX1: _.cloneDeep(teamOnePlayingX1)
         }
       });
       current.batting = "teamTwo";
@@ -90,7 +90,7 @@ export const Container: React.FC<{}> = () => {
     dispatch({
       type: "MATCH_UPDATE",
       payload: {
-        matchStatus: "LIVE",
+        matchStatus: "SCHEDULED",
         oversLimit: 20,
         current,
         teamOne: {
@@ -110,8 +110,13 @@ export const Container: React.FC<{}> = () => {
   };
 
   const pushOpeners = () => {
+    dispatch({
+      type: "MATCH_UPDATE_STATUS",
+      payload: {
+        status: "LIVE"
+      }
+    });
     const currentBattingTeam = match.current.batting;
-    console.log(currentBattingTeam);
     let innings = inningsOne.innings;
     let key = "ONE";
     if (match.current.innings === 2) {
@@ -120,11 +125,11 @@ export const Container: React.FC<{}> = () => {
     }
     dispatch({
       type: `INNINGS_${key}_PLAYER_ONE`,
-      payload: { ...innings.playingX1[0], status: "NOT_OUT" }
+      payload: { ...innings.playingX1[0], status: "NOT_OUT", balls: null }
     });
     dispatch({
       type: `INNINGS_${key}_PLAYER_TWO`,
-      payload: { ...innings.playingX1[1], status: "NOT_OUT" }
+      payload: { ...innings.playingX1[1], status: "NOT_OUT", balls: null }
     });
     dispatch({
       type: `INNINGS_${key}_UPDATE_TEAM_PLAYER_STATUS`,
@@ -186,32 +191,6 @@ export const Container: React.FC<{}> = () => {
     }
   };
 
-  const makePlayerOut = () => {
-    let { batting, innings } = inningsOne;
-    let key = "ONE";
-    if (match.current.innings === 2) {
-      innings = inningsTwo.innings;
-      batting = inningsTwo.batting;
-      key = "TWO";
-    }
-    const type = INDEXES[batting.strike].replace("{$}", key);
-    // const index = _.findIndex(innings.playingX1, { status: "NOT_OUT" });
-    console.log(type);
-    // if (index > -1) {
-    dispatch({
-      type,
-      payload: {
-        run: -1,
-        status: "OUT"
-      }
-    });
-    dispatch({
-      type: `INNINGS_${key}_UPDATE_TEAM_PLAYER_STATUS`,
-      payload: { ...innings.playingX1[batting.strike], status: "OUT" }
-    });
-    // }
-  };
-
   const pickNextBatsmen = () => {
     let { batting, innings } = inningsOne;
     let key = "ONE";
@@ -239,6 +218,59 @@ export const Container: React.FC<{}> = () => {
     }
   };
 
+  const endInnings = () => {
+    const { current: curr } = match;
+    const payload = {
+      innings: curr.innings + 1,
+      batting: curr.bowling,
+      bowling: curr.batting
+    };
+    dispatch({
+      type: "MATCH_UPDATE_INNINGS",
+      payload
+    });
+    dispatch({
+      type: "MATCH_UPDATE_STATUS",
+      payload: {
+        status: payload.innings > 2 ? "RESULT" : "STUMPS"
+      }
+    });
+  };
+
+  const makePlayerOut = () => {
+    let { batting, innings } = inningsOne;
+    let key = "ONE";
+    if (match.current.innings === 2) {
+      innings = inningsTwo.innings;
+      batting = inningsTwo.batting;
+      key = "TWO";
+    }
+    const type = INDEXES[batting.strike].replace("{$}", key);
+    dispatch({
+      type,
+      payload: {
+        run: -1,
+        status: "OUT"
+      }
+    });
+    dispatch({
+      type: `INNINGS_${key}_UPDATE_TEAM_PLAYER_STATUS`,
+      payload: { ...innings.playingX1[batting.strike], status: "OUT" }
+    });
+    dispatch({
+      type: `INNINGS_${key}_UPDATE_WICKETS`,
+      payload: {
+        wickets: 1
+      }
+    });
+    if (innings.wickets + 1 <= 9) {
+      pickNextBatsmen();
+    } else {
+      alert(`END OF INNINGS ${match.current.innings}`);
+      endInnings();
+    }
+  };
+
   React.useEffect(() => {
     Toss("India", "England");
   }, []);
@@ -250,36 +282,6 @@ export const Container: React.FC<{}> = () => {
       <button onClick={pushOpeners}>Push Openers</button>
       <button onClick={() => playerScore()}>UPDATE PLAYER SCORE</button>
       <button onClick={() => makePlayerOut()}>MAKE BATSMEN OUT</button>
-      <button onClick={pickNextBatsmen}>Pick Next Batsmen</button>
     </React.Fragment>
-    //   <h2>SCORECARD</h2>
-    //   {match.matchStatus === "LIVE" && (
-    //     <p style={{ textTransform: "uppercase" }}>
-    //       Toss won by {match.tossWon} and decided to do {match.decision} first
-    //     </p>
-    //   )}
-    //   <textarea
-    //     onChange={() => {}}
-    //     rows={8}
-    //     value={JSON.stringify(match, null, 4)}
-    //   ></textarea>
-    //   <h2>FIRST INNINGS</h2>
-    //   <textarea
-    //     onChange={() => {}}
-    //     rows={12}
-    //     value={JSON.stringify(inningsOne, null, 4)}
-    //   ></textarea>
-    //   <h2>SECOND INNINGS</h2>
-    //   <textarea
-    //     onChange={() => {}}
-    //     rows={12}
-    //     value={JSON.stringify(inningsTwo, null, 4)}
-    //   ></textarea>
-    //   <h2>SCORE SHEET</h2>
-    //   <button onClick={() => Toss("India", "England")}>TOSS</button>
-    //   <button onClick={pickNextBatsmen}>Pick Next Batsmen</button>
-    //   <button onClick={() => playerScore()}>UPDATE PLAYER SCORE</button>
-    // <button onClick={() => makePlayerOut()}>MAKE BATSMEN OUT</button>
-    // </div>
   );
 };

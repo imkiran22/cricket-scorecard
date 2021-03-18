@@ -4,6 +4,9 @@ import { Batsmen, Player } from "../types";
 const INNINGS_ONE_SCORE = "INNINGS_ONE_SCORE";
 const INNINGS_TWO_SCORE = "INNINGS_TWO_SCORE";
 
+const INNINGS_ONE_UPDATE_PAIR = "INNINGS_ONE_UPDATE_PAIR";
+const INNINGS_TWO_UPDATE_PAIR = "INNINGS_TWO_UPDATE_PAIR";
+
 const INNINGS_ONE_PLAYER_ONE = "INNINGS_ONE_PLAYER_ONE";
 const INNINGS_ONE_PLAYER_TWO = "INNINGS_ONE_PLAYER_TWO";
 const INNINGS_ONE_PLAYER_THREE = "INNINGS_ONE_PLAYER_THREE";
@@ -16,7 +19,7 @@ const INNINGS_ONE_PLAYER_NINE = "INNINGS_ONE_PLAYER_NINE";
 const INNINGS_ONE_PLAYER_TEN = "INNINGS_ONE_PLAYER_TEN";
 const INNINGS_ONE_PLAYER_ELEVEN = "INNINGS_ONE_PLAYER_ELEVEN";
 
-const INNINGS_TWO_PLAYER_ONE = "INNINGS_ONE_PLAYER_ONE";
+const INNINGS_TWO_PLAYER_ONE = "INNINGS_TWO_PLAYER_ONE";
 const INNINGS_TWO_PLAYER_TWO = "INNINGS_TWO_PLAYER_TWO";
 const INNINGS_TWO_PLAYER_THREE = "INNINGS_TWO_PLAYER_THREE";
 const INNINGS_TWO_PLAYER_FOUR = "INNINGS_TWO_PLAYER_FOUR";
@@ -40,7 +43,7 @@ const getPlayerInit = () =>
     threes: 0,
     fours: 0,
     sixes: 0,
-    balls: -1,
+    balls: 0,
     strikeRate: 0,
     run: -1,
     status: "DID_NOT_BAT"
@@ -128,15 +131,16 @@ const buildCaseHelperReducer = (
         state.currentScore += run;
       }
       //IF NO BALL DON'T ADD THE BALL COUNT
-      obj["balls"] = state[objRef].balls + 1;
+      if (obj.balls !== null) {
+        obj["balls"] = obj.balls + 1;
+      } else {
+        obj["balls"] = 0;
+      }
       obj["run"] = run;
       Object.assign(state[objRef], obj);
     }
   );
 };
-
-const INNINGS_ONE_UPDATE_PAIR = "INNINGS_ONE_UPDATE_PAIR";
-const INNINGS_TWO_UPDATE_PAIR = "INNINGS_TWO_UPDATE_PAIR";
 
 export const battingInningsOneReducer = createReducer(init(), (builder) => {
   for (const [ACTION_NAME, PROP_KEY] of BUILD_REDUCERS_INNINGS_ONE_MAP) {
@@ -175,16 +179,37 @@ export const battingInningsOneReducer = createReducer(init(), (builder) => {
 });
 
 export const battingInningsTwoReducer = createReducer(init(), (builder) => {
-  // builder.addCase(
-  //   INNINGS_TWO_PLAYER_ONE.toString(),
-  //   (state, action: { type: string; payload: Player }) => {
-  //     Object.assign(state.playerOne, action.payload);
-  //   }
-  // );
-  // builder.addCase(
-  //   INNINGS_TWO_PLAYER_TWO.toString(),
-  //   (state, action: { type: string; payload: Player }) => {
-  //     Object.assign(state.playerTwo, action.payload);
-  //   }
-  // );
+  for (const [ACTION_NAME, PROP_KEY] of BUILD_REDUCERS_INNINGS_TWO_MAP) {
+    buildCaseHelperReducer(builder, ACTION_NAME, PROP_KEY);
+  }
+  builder.addCase(
+    INNINGS_TWO_UPDATE_PAIR.toString(),
+    (
+      state: any,
+      action: {
+        type: string;
+        payload: {
+          strike: number;
+          nonStrike: number;
+          currentPair: Array<number>;
+        };
+      }
+    ) => {
+      Object.assign(state, action.payload);
+    }
+  );
+  builder.addCase(
+    INNINGS_TWO_SCORE.toString(),
+    (
+      state: any,
+      action: {
+        type: string;
+        payload: {
+          currentScore: number;
+        };
+      }
+    ) => {
+      state.currentScore += action.payload.currentScore;
+    }
+  );
 });

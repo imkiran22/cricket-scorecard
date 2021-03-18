@@ -20,29 +20,49 @@ export const ScoreCard: React.FC<{}> = () => {
   const match = useSelector((state: any) => state.match);
   const inningsOne = useSelector((state: any) => state.firstInnings);
   const inningsTwo = useSelector((state: any) => state.secondInnings);
-  // console.log(match, inningsOne, inningsTwo)
-  const striker = inningsOne.batting[MAP[inningsOne.batting.strike]];
-  const nonStriker = inningsOne.batting[MAP[inningsOne.batting.nonStrike]];
-  console.log(inningsOne, inningsTwo);
+  const inningsOneStriker = inningsOne.batting[MAP[inningsOne.batting.strike]];
+  const inningsOneNonStriker =
+    inningsOne.batting[MAP[inningsOne.batting.nonStrike]];
+  const inningsTwoStriker = inningsTwo.batting[MAP[inningsTwo.batting.strike]];
+  const inningsTwoNonStriker =
+    inningsTwo.batting[MAP[inningsTwo.batting.nonStrike]];
   return (
     <div className="score-card-container">
+      <h3>{match.matchStatus}</h3>
       <h1>
         {inningsOne.innings.teamName}: {inningsOne.innings.score}/
         {inningsOne.innings.wickets} {inningsOne.innings.overs} OVERS
       </h1>
       {
         <div>
-          <p>{striker.name}</p>
-          <p>{striker.score}*</p>
+          <p>{inningsOneStriker.name}</p>
+          <p>
+            {inningsOneStriker.score}* ({inningsOneStriker.balls})
+          </p>
 
-          <p>{nonStriker.name}</p>
-          <p>{nonStriker.score}</p>
+          <p>{inningsOneNonStriker.name}</p>
+          <p>
+            {inningsOneNonStriker.score} ({inningsOneNonStriker.balls})
+          </p>
         </div>
       }
       <h1>
         {inningsTwo.innings.teamName}: {inningsTwo.innings.score}/
-        {inningsOne.innings.wickets} {inningsTwo.innings.overs} OVERS
+        {inningsTwo.innings.wickets} {inningsTwo.innings.overs} OVERS
       </h1>
+      {
+        <div>
+          <p>{inningsTwoStriker.name}</p>
+          <p>
+            {inningsTwoStriker.score}* ({inningsTwoStriker.balls})
+          </p>
+
+          <p>{inningsTwoNonStriker.name}</p>
+          <p>
+            {inningsTwoNonStriker.score} ({inningsTwoNonStriker.balls})
+          </p>
+        </div>
+      }
     </div>
   );
 };
