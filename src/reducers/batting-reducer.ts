@@ -1,6 +1,9 @@
 import { createReducer } from "@reduxjs/toolkit";
 import { Batsmen, Player } from "../types";
 
+const INNINGS_ONE_SCORE = "INNINGS_ONE_SCORE";
+const INNINGS_TWO_SCORE = "INNINGS_TWO_SCORE";
+
 const INNINGS_ONE_PLAYER_ONE = "INNINGS_ONE_PLAYER_ONE";
 const INNINGS_ONE_PLAYER_TWO = "INNINGS_ONE_PLAYER_TWO";
 const INNINGS_ONE_PLAYER_THREE = "INNINGS_ONE_PLAYER_THREE";
@@ -12,6 +15,18 @@ const INNINGS_ONE_PLAYER_EIGHT = "INNINGS_ONE_PLAYER_EIGHT";
 const INNINGS_ONE_PLAYER_NINE = "INNINGS_ONE_PLAYER_NINE";
 const INNINGS_ONE_PLAYER_TEN = "INNINGS_ONE_PLAYER_TEN";
 const INNINGS_ONE_PLAYER_ELEVEN = "INNINGS_ONE_PLAYER_ELEVEN";
+
+const INNINGS_TWO_PLAYER_ONE = "INNINGS_ONE_PLAYER_ONE";
+const INNINGS_TWO_PLAYER_TWO = "INNINGS_TWO_PLAYER_TWO";
+const INNINGS_TWO_PLAYER_THREE = "INNINGS_TWO_PLAYER_THREE";
+const INNINGS_TWO_PLAYER_FOUR = "INNINGS_TWO_PLAYER_FOUR";
+const INNINGS_TWO_PLAYER_FIVE = "INNINGS_TWO_PLAYER_FIVE";
+const INNINGS_TWO_PLAYER_SIX = "INNINGS_TWO_PLAYER_SIX";
+const INNINGS_TWO_PLAYER_SEVEN = "INNINGS_TWO_PLAYER_SEVEN";
+const INNINGS_TWO_PLAYER_EIGHT = "INNINGS_TWO_PLAYER_EIGHT";
+const INNINGS_TWO_PLAYER_NINE = "INNINGS_TWO_PLAYER_NINE";
+const INNINGS_TWO_PLAYER_TEN = "INNINGS_TWO_PLAYER_TEN";
+const INNINGS_TWO_PLAYER_ELEVEN = "INNINGS_TWO_PLAYER_ELEVEN";
 
 const getPlayerInit = () =>
   <Batsmen>{
@@ -34,6 +49,9 @@ const init = () => {
   return {
     currentScore: 0,
     runRate: 0.0,
+    currentPair: [],
+    strike: 0,
+    nonStrike: 0,
     playerOne: getPlayerInit(),
     playerTwo: getPlayerInit(),
     playerThree: getPlayerInit(),
@@ -61,6 +79,20 @@ const BUILD_REDUCERS_INNINGS_ONE_MAP: Array<Array<string>> = [
   [INNINGS_ONE_PLAYER_NINE, "playerNine"],
   [INNINGS_ONE_PLAYER_TEN, "playerTen"],
   [INNINGS_ONE_PLAYER_ELEVEN, "playerEleven"]
+];
+
+const BUILD_REDUCERS_INNINGS_TWO_MAP: Array<Array<string>> = [
+  [INNINGS_TWO_PLAYER_ONE, "playerOne"],
+  [INNINGS_TWO_PLAYER_TWO, "playerTwo"],
+  [INNINGS_TWO_PLAYER_THREE, "playerThree"],
+  [INNINGS_TWO_PLAYER_FOUR, "playerFour"],
+  [INNINGS_TWO_PLAYER_FIVE, "playerFive"],
+  [INNINGS_TWO_PLAYER_SIX, "playerSix"],
+  [INNINGS_TWO_PLAYER_SEVEN, "playerSeven"],
+  [INNINGS_TWO_PLAYER_EIGHT, "playerEight"],
+  [INNINGS_TWO_PLAYER_NINE, "playerNine"],
+  [INNINGS_TWO_PLAYER_TEN, "playerTen"],
+  [INNINGS_TWO_PLAYER_ELEVEN, "playerEleven"]
 ];
 
 const buildCaseHelperReducer = (
@@ -93,6 +125,7 @@ const buildCaseHelperReducer = (
       }
       if (run > 0) {
         obj["score"] = obj["score"] + run;
+        state.currentScore += run;
       }
       //IF NO BALL DON'T ADD THE BALL COUNT
       obj["balls"] = state[objRef].balls + 1;
@@ -102,10 +135,43 @@ const buildCaseHelperReducer = (
   );
 };
 
+const INNINGS_ONE_UPDATE_PAIR = "INNINGS_ONE_UPDATE_PAIR";
+const INNINGS_TWO_UPDATE_PAIR = "INNINGS_TWO_UPDATE_PAIR";
+
 export const battingInningsOneReducer = createReducer(init(), (builder) => {
   for (const [ACTION_NAME, PROP_KEY] of BUILD_REDUCERS_INNINGS_ONE_MAP) {
     buildCaseHelperReducer(builder, ACTION_NAME, PROP_KEY);
   }
+  builder.addCase(
+    INNINGS_ONE_UPDATE_PAIR.toString(),
+    (
+      state: any,
+      action: {
+        type: string;
+        payload: {
+          strike: number;
+          nonStrike: number;
+          currentPair: Array<number>;
+        };
+      }
+    ) => {
+      Object.assign(state, action.payload);
+    }
+  );
+  builder.addCase(
+    INNINGS_ONE_SCORE.toString(),
+    (
+      state: any,
+      action: {
+        type: string;
+        payload: {
+          currentScore: number;
+        };
+      }
+    ) => {
+      state.currentScore += action.payload.currentScore;
+    }
+  );
 });
 
 export const battingInningsTwoReducer = createReducer(init(), (builder) => {

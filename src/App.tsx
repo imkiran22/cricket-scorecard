@@ -1,13 +1,13 @@
 import "./styles.css";
 import { store } from "./store";
 import { Provider } from "react-redux";
-import { ScoreCard } from "./components/index";
+import { Container } from "./components/index";
 
 export default function App() {
   return (
     <Provider store={store}>
       <div className="App">
-        <ScoreCard />
+        <Container />
       </div>
     </Provider>
   );

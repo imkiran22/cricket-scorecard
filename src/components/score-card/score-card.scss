@@ -1,0 +1,7 @@
+.score-card-container {
+  display: flex;
+  flex-flow: column nowrap;
+  flex-basis: 100%;
+  background: red;
+  min-height: 100px;
+}
