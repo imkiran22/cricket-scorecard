@@ -1,4 +1,24 @@
 .score-sheet {
+  margin-top: 10px;
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column wrap;
+  .run-score-wrapper {
+    padding: 10px;
+    input {
+      flex-basis: 100%;
+      padding: 5px;
+      margin: 10px;
+      pointer-events: none;
+      border: 1px solid gray;
+      background: lightgrey;
+    }
+    display: flex;
+    flex-flow: row wrap;
+    flex-basis: 100%;
+    background: orangered;
+    justify-content: center;
+    button {
+      flex-basis: 15%;
+    }
+  }
 }

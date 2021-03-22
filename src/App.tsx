@@ -6,7 +6,7 @@ import { Container } from "./components/index";
 export default function App() {
   return (
     <Provider store={store}>
-      <div className="App">
+      <div className="App" id="app">
         <Container />
       </div>
     </Provider>
